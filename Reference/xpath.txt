@@ -1,0 +1,4 @@
+#xpath
+//ul[@class="list_area"]//li/a/@href
+
+//ul[@class="ptm-list-view"]//li/a/@href
