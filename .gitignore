@@ -6,4 +6,8 @@ Logs/
 
 Resources/
 
+constant.py
+
 !Resources/xpath.txt
+
+test_requests.py
