@@ -48,6 +48,31 @@ def getImgUrlByWebsite(website, driver):
                 img_urls.append(url)      
     return img_urls
     
+
+    
+def extract_images(image_urls_list:list, file_path, failed_urls):
+    # Changing directory into a specific folder:
+    #os.chdir(directory_path)
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
+    # Downloading all of the images
+    for img in image_urls_list:
+        file_name = file_path+img.split('/')[-1]
+        
+        if os.path.isfile(file_name):
+            print(f"***Abort cause {img} exists")
+            continue
+        print(f"Downloading {img}")
+        try:
+            r = requests.get(img, stream=True,headers={'User-Agent': 'Mozilla/5.0'})
+            if r.status_code == 200:
+                with open(file_name, 'wb') as f:
+                    for chunk in r:
+                        f.write(chunk)
+        except Exception as e:
+            failed_urls.append([img,e])
+
+
 def fetchImgUrlInChapters(file, manga_path, website, isUpdate):
     failed_urls = []
     with open(file) as f:
@@ -75,51 +100,33 @@ def fetchImgUrlInChapters(file, manga_path, website, isUpdate):
     if failed_urls: 
         df = pd.DataFrame(failed_urls) 
         df.to_csv(f"failed_downloads_{title}_urls.csv", index=False)
-    
-def extract_images(image_urls_list:list, file_path, failed_urls):
-    # Changing directory into a specific folder:
-    #os.chdir(directory_path)
-    if not os.path.exists(file_path):
-        os.makedirs(file_path)
-    # Downloading all of the images
-    for img in image_urls_list:
-        file_name = file_path+img.split('/')[-1]
         
-        if os.path.isfile(file_name):
-            print(f"***Abort cause {img} exists")
-            continue
-        print(f"Downloading {img}")
-        try:
-            r = requests.get(img, stream=True,headers={'User-Agent': 'Mozilla/5.0'})
-            if r.status_code == 200:
-                with open(file_name, 'wb') as f:
-                    for chunk in r:
-                        f.write(chunk)
-        except Exception as e:
-            failed_urls.append([img,e])
- 
-title = '秘密教学' 
-website = 'Toptoonmh.com'  # '7mj.net'
-isUpdate = False # is it first time download or just update
-isTest = False
+def main():
+    title = '万能履历表' #秘密教学
+    website = 'Toptoonmh.com'  # '7mj.net' 'akuma.moe
+    isUpdate = False # is it first time download or just update
+    isTest = False
 
-resource_url_file = f'Reference/{title}_urls_test.txt' if isTest else f'Reference/{title}_urls.txt'
-directory_path = 'Downloads\\'
-manga_path = f'{directory_path}{title}\\'
-print(f"""
-************************************************************************    
-    Start scratching {title} 
-        Testing = {isTest} 
-        Update = {isUpdate}
-************************************************************************
-""")
+    resource_url_file = f'Reference/{title}_urls_test.txt' if isTest else f'Reference/{title}_urls.txt'
+    directory_path = '.\Downloads\\'
+    manga_path = f'{directory_path}{title}\\'
+    print(f"""
+    ************************************************************************    
+        Start scratching {title} 
+            Testing = {isTest} 
+            Update = {isUpdate}
+    ************************************************************************
+    """)
 
-fetchImgUrlInChapters(resource_url_file, manga_path, website, isUpdate)
+    fetchImgUrlInChapters(resource_url_file, manga_path, website, isUpdate)
 
-print(f"""
-************************************************************************   
-    End scratching {title} 
-        Testing = {isTest} 
-        Update = {isUpdate}
-************************************************************************
-""")
+    print(f"""
+    ************************************************************************   
+        End scratching {title} 
+            Testing = {isTest} 
+            Update = {isUpdate}
+    ************************************************************************
+    """)
+    
+if __name__ == "__main__":
+    main()
