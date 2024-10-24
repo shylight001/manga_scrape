@@ -3,6 +3,7 @@ import datetime
 import time
 import requests
 from selenium.webdriver.common.by import By 
+from selenium.webdriver.common.alert import Alert 
 from constant import FAILED_IMG_URLS_FILE_PATH,FAILED_PAGE_URLS_FILE_PATH, RESOURCE_URL_FILE_PATH, MANGA_DOWNLOAD_PATH, COOKIES, HEADERS, TITLE
 
 from Tools.chrome_driver_setup import setup_webdriver
@@ -39,6 +40,13 @@ def fetchImageURLsInAkumaCollection():
                 is_first_time = False
             else:
                 time.sleep(4)
+
+            #Handle alert box error
+            try:
+                Alert(driver).accept()
+            except:
+                pass
+
             # fetch img src attribute by xpath 
             img_url = driver.find_element(By.XPATH, "//div[@id='image-container']//img").get_attribute("src") 
 
@@ -48,7 +56,7 @@ def fetchImageURLsInAkumaCollection():
                 extract_images_akuma(img_url, MANGA_DOWNLOAD_PATH, failed_img_urls_file)
 
         except Exception as e:
-            print(f"\n!!!!!FAILED ON URL:{page_url}\n")   
+            print(f"\n!!!!!FAILED ON URL:{page_url}\n ERROR CODE: {e}")   
             failed_page_urls_file.write(f"{page_url}")  
 
     failed_page_urls_file.close()
